@@ -1,17 +1,55 @@
-import orderByProps from '../character';
+import extractSpecialAttacks from '../character';
 
-test('Проверяем работу функции', () => {
-  const obj = {
-    name: 'мечник', health: 10, level: 2, attack: 80, defence: 40,
-  };
-  const orderProps = orderByProps(obj, ['name', 'level']);
-  const expected = [
-    { key: 'name', value: 'мечник' },
-    { key: 'level', value: 2 },
-    { key: 'attack', value: 80 },
-    { key: 'defence', value: 40 },
-    { key: 'health', value: 10 },
-  ];
+describe('extractSpecialAttacks function', () => {
+  test('should extract special attacks with description', () => {
+    const character = {
+      special: [
+        {
+          id: 1, name: 'Attack1', description: 'Desc1', icon: 'http://...',
+        },
+        {
+          id: 2, name: 'Attack2', description: 'Desc2', icon: 'http://...',
+        },
+      ],
+    };
 
-  expect(orderProps).toEqual(expected);
+    const result = extractSpecialAttacks(character);
+
+    expect(result).toEqual([
+      {
+        id: 1, name: 'Attack1', description: 'Desc1', icon: 'http://...',
+      },
+      {
+        id: 2, name: 'Attack2', description: 'Desc2', icon: 'http://...',
+      },
+    ]);
+  });
+
+  test('should set default description for attacks without description', () => {
+    const character = {
+      special: [
+        { id: 1, name: 'Attack1', icon: 'http://...' },
+        { id: 2, name: 'Attack2', icon: 'http://...' },
+      ],
+    };
+
+    const result = extractSpecialAttacks(character);
+
+    expect(result).toEqual([
+      {
+        id: 1, name: 'Attack1', description: 'Описание недоступно', icon: 'http://...',
+      },
+      {
+        id: 2, name: 'Attack2', description: 'Описание недоступно', icon: 'http://...',
+      },
+    ]);
+  });
+
+  test('should handle empty special attacks array', () => {
+    const character = { special: [] };
+
+    const result = extractSpecialAttacks(character);
+
+    expect(result).toEqual([]);
+  });
 });
